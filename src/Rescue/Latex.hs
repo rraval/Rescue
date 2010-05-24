@@ -1,28 +1,12 @@
 module Rescue.Latex where
 
-    data Resume a = Resume (String -> String)
-
-    instance Monad Resume where
-        (Resume r) >> f = Resume $ r . a
-            where (Resume a) = f
-
-        (>>=)  = undefined
-        return = undefined
-
-    instance Show (Resume a) where
-        show (Resume a) = a ""
+    import Rescue.Base
 
     date :: String -> String
-    date = id
+    date = id  -- The default version is the same in LaTeX
 
     newline :: String -> String
-    newline = id
-
-    surround :: String -> String -> Resume a -> Resume a
-    surround start end resume = do
-      Resume (start++)
-      resume
-      Resume (end++)
+    newline = replace "\n" "\\\\"
                       
     section :: String -> Resume a -> Resume a
     section s = surround ("\\begin{ressection}{" ++ s ++ "}\n")
@@ -42,9 +26,6 @@ module Rescue.Latex where
     eduitem :: String -> String -> String -> String -> Resume a
     eduitem title loc time desc = Resume $ \n ->
       "\\eduitem{" ++ title ++ "}{" ++ loc ++ "}{" ++ time ++ "}{" ++ desc ++ "}\n" ++ n
-
-    postscript :: Resume a
-    postscript = Resume $ ("\\end{document}\n"++)
                       
     preamble :: String -> String -> String -> String -> Resume a
     preamble name addr phone email = Resume $ \n -> unlines [
@@ -155,3 +136,6 @@ module Rescue.Latex where
       "\\vspace{-1pt} {\\small\\itshape " ++ addr ++ " \\hfill "
           ++ phone ++ "; " ++ email ++ "}",
       "\\vspace{8 pt}\n\n"] ++ n
+
+    postscript :: Resume a
+    postscript = Resume $ ("\\end{document}\n"++)
