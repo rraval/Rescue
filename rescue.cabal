@@ -1,0 +1,8 @@
+Name:           rescue
+Version:        0.1
+Synopsis:       Domain specific language for resume formatting.
+License:        MIT
+License-file:   LICENSE
+Author:         Ronuk Raval
+Maintainer:     ronuk.raval@gmail.com
+Build-type:     Simple

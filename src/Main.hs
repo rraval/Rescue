@@ -1,5 +1,3 @@
-module Main where
-
 import Rescue.Latex
 
 resume = do
