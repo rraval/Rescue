@@ -3,29 +3,34 @@ module Rescue.Latex where
     import Rescue.Base
 
     date :: String -> String
-    date = id  -- The default version is the same in LaTeX
+    date = id                          -- The default version is the same in LaTeX
 
     newline :: String -> String
-    newline = replace "\n" "\\\\"
+    newline = replace "\n" "\\\\\\\\"  -- yes, there's 8 backslashes...
+                                       -- and it only translates into 2 in the output
                       
     section :: String -> Resume a -> Resume a
     section s = surround ("\\begin{ressection}{" ++ s ++ "}\n")
                          "\\end{ressection}\n"
 
     subsection :: String -> Resume a -> Resume a
-    subsection s = surround ("\\begin{reslist}{" ++ s ++ "}\n")
-                            "\\end{reslist}\n"
+    subsection s = surround ("\\begin{ressubsection}{" ++ s ++ "}\n")
+                            "\\end{ressubsection}\n"
 
-    item :: String -> Resume a
-    item s = Resume $ \n -> "\\resitem{" ++ s ++ "}\n" ++ n
+    header :: String -> String -> String -> Resume a -> Resume a
+    header title date comment = surround ("\\begin{resheader}{" ++ title ++ "}{"
+                                          ++ date ++ "}{" ++ comment ++ "}\n")
+                                         "\\end{resheader}\n"
 
     bigitem :: String -> String -> String -> Resume a
     bigitem loc time desc = Resume $ \n ->
       "\\resbigitem{" ++ loc ++ "}{" ++ time ++ "}{" ++ desc ++ "}\n" ++ n
+                                         
+    item :: String -> Resume a
+    item s = Resume $ \n -> "\\resitem{" ++ s ++ "}\n" ++ n
 
-    eduitem :: String -> String -> String -> String -> Resume a
-    eduitem title loc time desc = Resume $ \n ->
-      "\\eduitem{" ++ title ++ "}{" ++ loc ++ "}{" ++ time ++ "}{" ++ desc ++ "}\n" ++ n
+    subitem :: String -> Resume a
+    subitem s = Resume $ \n -> "\\ressubitem{" ++ s ++ "}\n" ++ n
                       
     preamble :: String -> String -> String -> String -> Resume a
     preamble name addr phone email = Resume $ \n -> unlines [
@@ -35,7 +40,7 @@ module Rescue.Latex where
       "\\usepackage{hyperref}",
 
       "\\pagestyle{empty}",
-      "\\geometry{letterpaper,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in,",
+      "\\geometry{letterpaper,tmargin=1in,bmargin=1in,lmargin=0.75in,rmargin=0.75in,",
       "    headheight=0in,headsep=0in,footskip=.3in}",
 
       "\\setlength{\\parindent}{0in}",
@@ -44,8 +49,7 @@ module Rescue.Latex where
       "\\setlength{\\topsep}{0in}",
       "\\setlength{\\tabcolsep}{0in}",
 
-      "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
-      "% New commands and environments",
+      "%% New commands and environments",
 
       "% This defines how the name looks",
       "\\newcommand{\\bigname}[1]{",
@@ -68,42 +72,20 @@ module Rescue.Latex where
       "    \\end{itemize}",
       "}",
 
-      "% A resitem is a simple list element in a ressection (first level)",
-      "\\newcommand{\\resitem}[1]{",
-      "    \\vspace{-4pt}",
-      "    \\item \\begin{flushleft} #1 \\end{flushleft}",
+      "% A subsection is nested within a section",
+      "\\newenvironment{ressubsection}[1]{",
+      "    \\resitem{\\textbf{#1}}",
+      "    \\vspace{-5pt}",
+      "    \\begin{itemize}",
+      "}{",
+      "    \\end{itemize}",
       "}",
 
-      "\\newcommand{\\resrightitem}[1]{",
-      "    \\vspace{-4pt}",
-      "    \\item \\begin{flushright} #1 \\end{flushright}",
-      "}",
-
-      "% A ressubitem is a simple list element in anything but a ressection (second level)",
-      "\\newcommand{\\ressubitem}[1]{",
-      "    \\vspace{-1pt}",
-      "    \\item \\begin{flushleft} #1 \\end{flushleft}",
-      "}",
-
-      "% A resbigitem is a complex list element for stuff like jobs and education:",
-      "%  Arg 1: Name of company or university",
-      "%  Arg 2: Location",
-      "%  Arg 3: Title and/or date range",
-      "\\newcommand{\\resbigitem}[3]{",
-      "    %\\vspace{-5pt}",
-      "    \\item",
-      "    \\textbf{#1} \\hfill \\textit{#2} \\\\",
-      "    #3",
-      "}",
-
-      "\\newcommand{\\eduitem}[4]{",
-      "  \\item",
-      "    \\textbf{#1} \\hfill \\textit{#2} \\\\ \\mbox{} \\hfill \\textit{#3} \\\\",
-      "    #4",
-      "}",
-
-      "% This is a list that comes with a resbigitem",
-      "\\newenvironment{ressubsec}[3]{",
+      "% A sublist for complicated things",
+      "%   Arg 1: Title",
+      "%   Arg 2: Date",
+      "%   Arg 3: Comment before subitems",
+      "\\newenvironment{resheader}[3]{",
       "    \\resbigitem{#1}{#2}{#3}",
       "    \\vspace{-2pt}",
       "    \\begin{itemize}",
@@ -112,20 +94,29 @@ module Rescue.Latex where
       "    \\end{itemize}",
       "}",
 
-      "% This is a simple sublist",
-      "\\newenvironment{reslist}[1]{",
-      "    \\resitem{\\textbf{#1}}",
-      "    \\vspace{-5pt}",
-      "    \\begin{itemize}",
-      "}{",
-      "    \\end{itemize}",
+      "% A resitem is a simple list element in a ressection (first level)",
+      "\\newcommand{\\resitem}[1]{",
+      "    \\vspace{-4pt}",
+      "    \\item \\begin{flushleft} #1 \\end{flushleft}",
       "}",
 
+      "% A resbigitem is a complex list element for stuff like jobs and education:",
+      "%  Arg 1: Title",
+      "%  Arg 2: Date",
+      "%  Arg 3: Description",
+      "\\newcommand{\\resbigitem}[3]{",
+      "    \\item",
+      "    \\textbf{#1} \\hfill \\textit{#2} \\\\",
+      "    #3",
+      "}",
 
+      "% A ressubitem is a simple list element in anything but a ressection (second level)",
+      "\\newcommand{\\ressubitem}[1]{",
+      "    \\vspace{-1pt}",
+      "    \\item \\begin{flushleft} #1 \\end{flushleft}",
+      "}",
 
-      "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
-      "% Now for the actual document:",
-
+      "%% The actual document.",
       "\\begin{document}",
 
       "\\fontfamily{ppl} \\selectfont",

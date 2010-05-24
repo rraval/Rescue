@@ -21,4 +21,4 @@ module Rescue.Base where
       Resume (end++)
 
     replace :: String -> String -> String -> String
-    replace rep = subRegex $ mkRegex rep
+    replace rep with str = subRegex (mkRegex rep) str with
