@@ -1,0 +1,93 @@
+\documentclass[11pt,oneside]{article}
+\usepackage{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\pagestyle{empty}
+\geometry{letterpaper,tmargin=1in,bmargin=1in,lmargin=0.75in,rmargin=0.75in,
+    headheight=0in,headsep=0in,footskip=.3in}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{0in}
+\setlength{\itemsep}{0in}
+\setlength{\topsep}{0in}
+\setlength{\tabcolsep}{0in}
+%% New commands and environments
+% This defines how the name looks
+\newcommand{\bigname}[1]{
+    \begin{center}\fontfamily{phv}\selectfont\Huge\scshape#1\end{center}
+}
+\newcommand{\respara}[1]{
+    \vspace{4pt}
+    {\fontfamily{phv} \selectfont \Large #1} \\
+    \vspace{4pt}
+    \hspace{19pt}
+}
+% A ressection is a main section (<H1>Section</H1>)
+\newenvironment{ressection}[1]{
+    \respara{#1}
+    \begin{itemize}
+    \vspace{-20pt}
+}{
+    \end{itemize}
+}
+% A subsection is nested within a section
+\newenvironment{ressubsection}[1]{
+    \resitem{\textbf{#1}}
+    \vspace{-5pt}
+    \begin{itemize}
+}{
+    \end{itemize}
+}
+% A sublist for complicated things
+%   Arg 1: Title
+%   Arg 2: Date
+%   Arg 3: Comment before subitems
+\newenvironment{resheader}[3]{
+    \resbigitem{#1}{#2}{#3}
+    \vspace{-2pt}
+    \begin{itemize}
+    \vspace{-1.7em}
+}{
+    \end{itemize}
+}
+% A resitem is a simple list element in a ressection (first level)
+\newcommand{\resitem}[1]{
+    \vspace{-4pt}
+    \item \begin{flushleft} #1 \end{flushleft}
+}
+% A resbigitem is a complex list element for stuff like jobs and education:
+%  Arg 1: Title
+%  Arg 2: Date
+%  Arg 3: Description
+\newcommand{\resbigitem}[3]{
+    \item
+    \textbf{#1} \hfill \textit{#2} \\
+    #3
+}
+% A ressubitem is a simple list element in anything but a ressection (second level)
+\newcommand{\ressubitem}[1]{
+    \vspace{-1pt}
+    \item \begin{flushleft} #1 \end{flushleft}
+}
+%% The actual document.
+\begin{document}
+\fontfamily{ppl} \selectfont
+% Name with horizontal rule
+\bigname{John Doe}
+\vspace{-8pt} \rule{\textwidth}{1pt}
+\vspace{-1pt} {\small\itshape 1234 Fifth Street, Province, Country \hfill (123) 456-7890; example@example.com}
+\vspace{8 pt}
+
+
+\begin{ressection}{Skills}
+\resitem{I like to do stuff}
+\resitem{I'm also really good at other stuff}
+\end{ressection}
+\begin{ressection}{Education}
+\resbigitem{University of Someplace}{Someplace, Country (From Date -- To Date)}{Candidate for a degree\\In some program at some faculty or other}
+\begin{ressubsection}{Relevant Courses and Assignments}
+\resbigitem{Course Title}{Location (From Date -- To Date)}{Description of what tasks were completed and why they are relevant.}
+\resbigitem{Some other Course}{At the end of the world (0 AD -- 0 AD)}{Insert filler material.}
+\end{ressubsection}
+\end{ressection}
+\end{document}
+
