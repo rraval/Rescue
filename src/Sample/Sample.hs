@@ -7,7 +7,6 @@ resume = do
            "example@example.com"
   skills
   education
-  postscript
 
 skills = section "Skills" $ do
            item "I like to do stuff"
@@ -25,4 +24,4 @@ education = section "Education" $ do
                               (date "At the end of the world (0 AD -- 0 AD)")
                               "Insert filler material."
 
-main = putStrLn $ show resume
+main = putStrLn $ show $ resume >> postscript
